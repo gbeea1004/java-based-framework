@@ -17,25 +17,25 @@ public class JdbcTemplate {
         }
     }
 
-    public static List selectAllObjects(String sql, PreparedStatementSetter pstmts, RowMapper rowMapper) throws SQLException {
+    public static <T> List<T> selectAllObjects(String sql, PreparedStatementSetter pstmts, RowMapper rowMapper) throws SQLException {
         try (Connection con = ConnectionManager.getConnection(); PreparedStatement pstmt = con.prepareStatement(sql)) {
-            List objects = new ArrayList<>();
+            List<T> objects = new ArrayList<>();
             pstmts.values(pstmt);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    objects.add(rowMapper.mapRow(rs));
+                    objects.add((T) rowMapper.mapRow(rs));
                 }
             }
             return objects;
         }
     }
 
-    public static Object selectForObject(String sql, PreparedStatementSetter pstmts, RowMapper rowMapper) throws SQLException {
+    public static <T> T selectForObject(String sql, PreparedStatementSetter pstmts, RowMapper rowMapper) throws SQLException {
         try (Connection con = ConnectionManager.getConnection(); PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmts.values(pstmt);
             try (ResultSet rs = pstmt.executeQuery()) {
                 rs.next();
-                return rowMapper.mapRow(rs);
+                return (T) rowMapper.mapRow(rs);
             }
         }
     }
