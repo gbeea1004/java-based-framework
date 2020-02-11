@@ -1,6 +1,7 @@
 package user.dao;
 
 import core.jdbc.ConnectionManager;
+import exception.DataAccessException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,21 +11,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcTemplate {
-    public static void updateQuery(String sql, PreparedStatementSetter pstmts) throws SQLException {
+    public static void updateQuery(String sql, PreparedStatementSetter pstmts) throws DataAccessException {
         try (Connection con = ConnectionManager.getConnection(); PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmts.values(pstmt);
             pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
         }
     }
 
-    public static void updateQuery(String sql, Object... values) throws SQLException {
+    public static void updateQuery(String sql, Object... values) throws DataAccessException {
         try (Connection con = ConnectionManager.getConnection(); PreparedStatement pstmt = con.prepareStatement(sql)) {
             createPreparedStatementSetter(values).values(pstmt);
             pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
         }
     }
 
-    public static <T> List<T> selectAllObjects(String sql, RowMapper<T> rowMapper, PreparedStatementSetter pstmts) throws SQLException {
+    public static <T> List<T> selectAllObjects(String sql, RowMapper<T> rowMapper, PreparedStatementSetter pstmts) throws DataAccessException {
         try (Connection con = ConnectionManager.getConnection(); PreparedStatement pstmt = con.prepareStatement(sql)) {
             List<T> objects = new ArrayList<>();
             pstmts.values(pstmt);
@@ -34,10 +39,12 @@ public class JdbcTemplate {
                 }
             }
             return objects;
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
         }
     }
 
-    public static <T> List<T> selectAllObjects(String sql, RowMapper<T> rowMapper, Object... values) throws SQLException {
+    public static <T> List<T> selectAllObjects(String sql, RowMapper<T> rowMapper, Object... values) throws DataAccessException {
         try (Connection con = ConnectionManager.getConnection(); PreparedStatement pstmt = con.prepareStatement(sql)) {
             createPreparedStatementSetter(values).values(pstmt);
             List<T> objects = new ArrayList<>();
@@ -47,6 +54,8 @@ public class JdbcTemplate {
                 }
             }
             return objects;
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
         }
     }
 
