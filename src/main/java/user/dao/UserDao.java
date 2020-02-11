@@ -13,32 +13,23 @@ import java.util.List;
 public class UserDao {
     public void insert(User user) throws SQLException {
         JdbcTemplate template = new JdbcTemplate() {
-
             @Override
-            public String createQuery() {
-                return "INSERT INTO users VALUES (?, ?, ?, ?)";
-            }
-
-            @Override
-            public void setValues(PreparedStatement pstmt, User user) throws SQLException {
+            public void setValues(PreparedStatement pstmt) throws SQLException {
                 pstmt.setString(1, user.getUserId());
                 pstmt.setString(2, user.getPassword());
                 pstmt.setString(3, user.getName());
                 pstmt.setString(4, user.getEmail());
             }
         };
-        template.execute(user);
+
+        String sql = "INSERT INTO users VALUES (?, ?, ?, ?)";
+        template.execute(sql);
     }
 
     public void update(User user) throws SQLException {
         JdbcTemplate template = new JdbcTemplate() {
             @Override
-            public String createQuery() {
-                return "UPDATE users SET password = ?, name = ?, email = ? WHERE userId = ?";
-            }
-
-            @Override
-            public void setValues(PreparedStatement pstmt, User user) throws SQLException {
+            public void setValues(PreparedStatement pstmt) throws SQLException {
                 pstmt.setString(1, user.getPassword());
                 pstmt.setString(2, user.getName());
                 pstmt.setString(3, user.getEmail());
@@ -46,7 +37,8 @@ public class UserDao {
             }
         };
 
-        template.execute(user);
+        String sql = "UPDATE users SET password = ?, name = ?, email = ? WHERE userId = ?";
+        template.execute(sql);
     }
 
     public List<User> findAll() throws SQLException {
