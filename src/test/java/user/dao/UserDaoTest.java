@@ -2,6 +2,7 @@ package user.dao;
 
 import core.jdbc.ConnectionManager;
 import core.test.BaseTest;
+import exception.DataAccessException;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
@@ -20,7 +21,7 @@ public class UserDaoTest extends BaseTest {
     }
 
     @Test
-    public void crud() throws Exception {
+    public void crud() throws DataAccessException {
         User expected = new User("userId", "password", "name", "javajigi@email.com");
         UserDao userDao = new UserDao();
         userDao.insert(expected);
@@ -31,10 +32,14 @@ public class UserDaoTest extends BaseTest {
         userDao.update(expected);
         actual = userDao.findByUserId(expected.getUserId());
         softly.assertThat(actual).isEqualTo(expected);
+
+        userDao.delete(expected);
+        actual = userDao.findByUserId(expected.getUserId());
+        softly.assertThat(actual).isNull();
     }
 
     @Test
-    public void findAll() throws Exception {
+    public void findAll() throws DataAccessException {
         UserDao userDao = new UserDao();
         List<User> users = userDao.findAll();
         softly.assertThat(users).hasSize(1);

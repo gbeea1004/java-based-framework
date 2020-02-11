@@ -59,13 +59,17 @@ public class JdbcTemplate {
         }
     }
 
-    public static <T> T selectForObject(String sql, RowMapper<T> rowMapper, PreparedStatementSetter pstmts) throws SQLException {
+    public static <T> T selectForObject(String sql, RowMapper<T> rowMapper, PreparedStatementSetter pstmts) throws DataAccessException {
         try (Connection con = ConnectionManager.getConnection(); PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmts.values(pstmt);
             try (ResultSet rs = pstmt.executeQuery()) {
-                rs.next();
+                if (!rs.next()) {
+                    return null;
+                }
                 return rowMapper.mapRow(rs);
             }
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
         }
     }
 
